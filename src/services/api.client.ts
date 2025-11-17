@@ -133,15 +133,25 @@ class APIClient {
   }
 
   // Transaction endpoints
-  async parseTransaction(
+  async parseText(
     ctx: any,
     text: string,
-    languageCode?: string
   ): Promise<ParsedTransaction> {
     return this.request<ParsedTransaction>(ctx, {
       method: "POST",
       url: "/parse/text",
-      data: { content: text, language_code: languageCode },
+      data: { content: text },
+    });
+  }
+
+  async parseVoice(
+    ctx: any,
+    file_url: string,
+  ): Promise<ParsedTransaction> {
+    return this.request<ParsedTransaction>(ctx, {
+      method: "POST",
+      url: "/parse/voice",
+      data: { file_url },
     });
   }
 

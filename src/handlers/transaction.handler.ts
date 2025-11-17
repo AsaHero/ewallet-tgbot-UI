@@ -79,10 +79,9 @@ export async function transactionHandler(ctx: BotContext) {
     // Parse the transaction using AI
     wait_messege = await ctx.reply("🤖 Анализирую...");
 
-    const parsed = await apiClient.parseTransaction(
+    const parsed = await apiClient.parseText(
       ctx,
-      text,
-      ctx.from.language_code
+      text
     );
    const user = await apiClient.getMe(ctx);
 
