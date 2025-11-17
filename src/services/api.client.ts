@@ -120,7 +120,7 @@ class APIClient {
     return this.request<ParsedTransaction>(tgUserId, {
       method: "POST",
       url: "/parse/text",
-      data: {content: text, language_code: languageCode },
+      data: { content: text, language_code: languageCode },
     });
   }
 
@@ -154,8 +154,14 @@ class APIClient {
       limit?: number;
       offset?: number;
     }
-  ): Promise<Transaction[]> {
-    return this.request<Transaction[]>(tgUserId, {
+  ): Promise<{
+    items: Transaction[];
+    pagination: { limit: number; offset: number; total: number };
+  }> {
+    return this.request<{
+      items: Transaction[];
+      pagination: { limit: number; offset: number; total: number };
+    }>(tgUserId, {
       method: "GET",
       url: "/transactions",
       params,
