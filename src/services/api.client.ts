@@ -1,14 +1,14 @@
-import axios, { AxiosInstance, AxiosRequestConfig } from 'axios';
-import { config } from '../config/env';
-import { authService } from './auth.service';
+import axios, { AxiosInstance, AxiosRequestConfig } from "axios";
+import { config } from "../config/env";
+import { authService } from "./auth.service";
 import {
   User,
   Account,
   Transaction,
   Category,
   ParsedTransaction,
-  TransactionStats
-} from '../types';
+  TransactionStats,
+} from "../types";
 
 class APIClient {
   private client: AxiosInstance;
@@ -27,7 +27,7 @@ class APIClient {
     const token = await authService.getToken(tgUserId);
 
     if (!token) {
-      throw new Error('User not authenticated');
+      throw new Error("User not authenticated");
     }
 
     try {
@@ -43,8 +43,8 @@ class APIClient {
     } catch (error: any) {
       if (error.response?.status === 401) {
         // Token expired, clear it
-        await authService.clearToken(tgUserId);
-        throw new Error('Сессия истекла. Попробуйте снова.');
+        authService.clearToken(tgUserId);
+        throw new Error("Сессия истекла. Попробуйте снова.");
       }
       throw error;
     }
@@ -53,8 +53,8 @@ class APIClient {
   // User endpoints
   async getMe(tgUserId: number): Promise<User> {
     return this.request<User>(tgUserId, {
-      method: 'GET',
-      url: '/users/me',
+      method: "GET",
+      url: "/users/me",
     });
   }
 
@@ -63,8 +63,8 @@ class APIClient {
     data: { currency_code?: string; language_code?: string }
   ): Promise<User> {
     return this.request<User>(tgUserId, {
-      method: 'PUT',
-      url: '/users/me',
+      method: "PATCH",
+      url: "/users/me",
       data,
     });
   }
@@ -72,8 +72,8 @@ class APIClient {
   // Account endpoints
   async getAccounts(tgUserId: number): Promise<Account[]> {
     return this.request<Account[]>(tgUserId, {
-      method: 'GET',
-      url: '/accounts',
+      method: "GET",
+      url: "/accounts",
     });
   }
 
@@ -82,12 +82,12 @@ class APIClient {
     data: {
       name: string;
       balance?: number;
-      is_default?: boolean
+      is_default?: boolean;
     }
   ): Promise<Account> {
     return this.request<Account>(tgUserId, {
-      method: 'POST',
-      url: '/accounts',
+      method: "POST",
+      url: "/accounts",
       data,
     });
   }
@@ -98,7 +98,7 @@ class APIClient {
     data: { name?: string; is_default?: boolean }
   ): Promise<Account> {
     return this.request<Account>(tgUserId, {
-      method: 'PUT',
+      method: "PATCH",
       url: `/accounts/${accountId}`,
       data,
     });
@@ -106,7 +106,7 @@ class APIClient {
 
   async deleteAccount(tgUserId: number, accountId: string): Promise<void> {
     return this.request<void>(tgUserId, {
-      method: 'DELETE',
+      method: "DELETE",
       url: `/accounts/${accountId}`,
     });
   }
@@ -118,9 +118,9 @@ class APIClient {
     languageCode?: string
   ): Promise<ParsedTransaction> {
     return this.request<ParsedTransaction>(tgUserId, {
-      method: 'POST',
-      url: '/transactions/parse',
-      data: { text, language_code: languageCode },
+      method: "POST",
+      url: "/parse/text",
+      data: { content: text, language_code: languageCode },
     });
   }
 
@@ -129,7 +129,7 @@ class APIClient {
     data: {
       account_id: string;
       category_id?: number;
-      type: 'income' | 'expense';
+      type: "income" | "expense";
       amount: number;
       currency_code: string;
       note?: string;
@@ -137,8 +137,8 @@ class APIClient {
     }
   ): Promise<Transaction> {
     return this.request<Transaction>(tgUserId, {
-      method: 'POST',
-      url: '/transactions',
+      method: "POST",
+      url: "/transactions",
       data,
     });
   }
@@ -148,16 +148,22 @@ class APIClient {
     params?: {
       account_id?: string;
       category_id?: number;
-      type?: 'income' | 'expense';
+      type?: "income" | "expense";
       from?: string;
       to?: string;
       limit?: number;
       offset?: number;
     }
-  ): Promise<Transaction[]> {
-    return this.request<Transaction[]>(tgUserId, {
-      method: 'GET',
-      url: '/transactions',
+  ): Promise<{
+    items: Transaction[];
+    pagination: { limit: number; offset: number; total: number };
+  }> {
+    return this.request<{
+      items: Transaction[];
+      pagination: { limit: number; offset: number; total: number };
+    }>(tgUserId, {
+      method: "GET",
+      url: "/transactions",
       params,
     });
   }
@@ -168,15 +174,18 @@ class APIClient {
     data: Partial<Transaction>
   ): Promise<Transaction> {
     return this.request<Transaction>(tgUserId, {
-      method: 'PUT',
+      method: "PUT",
       url: `/transactions/${transactionId}`,
       data,
     });
   }
 
-  async deleteTransaction(tgUserId: number, transactionId: string): Promise<void> {
+  async deleteTransaction(
+    tgUserId: number,
+    transactionId: string
+  ): Promise<void> {
     return this.request<void>(tgUserId, {
-      method: 'DELETE',
+      method: "DELETE",
       url: `/transactions/${transactionId}`,
     });
   }
@@ -184,8 +193,8 @@ class APIClient {
   // Category endpoints
   async getCategories(tgUserId: number): Promise<Category[]> {
     return this.request<Category[]>(tgUserId, {
-      method: 'GET',
-      url: '/categories',
+      method: "GET",
+      url: "/categories",
     });
   }
 
@@ -199,8 +208,8 @@ class APIClient {
     }
   ): Promise<TransactionStats> {
     return this.request<TransactionStats>(tgUserId, {
-      method: 'GET',
-      url: '/stats/summary',
+      method: "GET",
+      url: "/stats/summary",
       params,
     });
   }
